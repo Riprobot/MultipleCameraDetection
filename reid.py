@@ -1,5 +1,5 @@
 from boxmot import BotSort
-from boxmot.utils.ops import yolox_preprocess
+# from boxmot.utils.ops import yolox_preprocess
 import cv2
 import gdown
 import torch

@@ -7,6 +7,7 @@ from reid import get_features
 from camera_calib import Camera
 from scipy.spatial.distance import cosine
 from itertools import combinations
+from result_aggregator import Aggregator
 
 def distance_2d(p1, p2):
     return ((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)**0.5
@@ -57,39 +58,7 @@ def main():
     frame_widths = [int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)) for cap in captures]
     frame_heights = [int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)) for cap in captures]
     
-    max_frames = int(fps_list[0] * 30)
-    
-    x_min, x_max = -10, 10 
-    y_min, y_max = -0.2, 3
-    width_m = x_max - x_min
-    height_m = y_max - y_min
-
-    scale_factor = 150.0
-    margin_x = 200
-    margin_y = 300
-    topdown_width = int(width_m * scale_factor + margin_x)
-    topdown_height = int(height_m * scale_factor + margin_y)
-
-    def real_to_canvas(rx, ry):
-        shifted_x = rx - x_min
-        shifted_y = ry - y_min
-        cx = int(shifted_x * scale_factor) + margin_x // 2
-        cy = int(shifted_y * scale_factor) + margin_y // 2
-        cy = topdown_height - cy
-        return cx, cy
-
-    def draw_grid(canvas):
-        grid_spacing_m = 1.0
-        for x in np.arange(x_min, x_max + grid_spacing_m, grid_spacing_m):
-            cx, _ = real_to_canvas(x, y_min)
-            cv2.line(canvas, (cx, 0), (cx, topdown_height), (200, 200, 200), 1)
-            cv2.putText(canvas, f"{x:.1f}", (cx + 5, topdown_height - 10),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.4, (80, 80, 80), 1)
-        for y in np.arange(y_min, y_max + grid_spacing_m, grid_spacing_m):
-            _, cy = real_to_canvas(x_min, y)
-            cv2.line(canvas, (0, cy), (topdown_width, cy), (200, 200, 200), 1)
-            cv2.putText(canvas, f"{y:.1f}", (5, cy - 5),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.4, (80, 80, 80), 1)
+    max_frames = int(fps_list[0] * 60)
     
     out_cams = []
     for i in range(num_cameras):
@@ -101,15 +70,8 @@ def main():
         )
         out_cams.append(writer)
     
-    out_topdown = cv2.VideoWriter(
-        "output_topdown_combined.mp4",
-        cv2.VideoWriter_fourcc(*"mp4v"),
-        max(fps_list),
-        (topdown_width, topdown_height)
-    )
-    
     frame_count = 0
-
+    aggregator = Aggregator()
     match_history = []
     while True:
         frames = []
@@ -265,34 +227,15 @@ def main():
         match_history.append(current_matches)
         if len(match_history) > 5:
             match_history.pop(0)
-        
-        topdown_canvas = np.ones((topdown_height, topdown_width, 3), dtype=np.uint8) * 255
-        draw_grid(topdown_canvas)
-        
-        for cluster in clusters:
-            cx, cy = real_to_canvas(cluster["pos"][0], cluster["pos"][1])
-            if len(cluster["labels"]) > 1:
-                color = (0, 0, 255)
-            else:
-                cam_id = int(cluster["labels"][0].split(":")[0][1:])
-                color = (255, 0, 0) if cam_id == 1 else (0, 128, 0)
-            cv2.circle(topdown_canvas, (cx, cy), 8, color, -1)
-            label_text = " | ".join(cluster["labels"])
-            cv2.putText(topdown_canvas, label_text, (cx + 10, cy),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
-            print(f"Frame {frame_count} | Cluster at ({cluster['pos'][0]:.2f}, {cluster['pos'][1]:.2f}) with labels: {label_text}")
-        
+        aggregator.update(clusters)
         for i in range(num_cameras):
             out_cams[i].write(frames[i])
-        out_topdown.write(topdown_canvas)
-        
         frame_count += 1
 
     for cap in captures:
         cap.release()
     for writer in out_cams:
         writer.release()
-    out_topdown.release()
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
