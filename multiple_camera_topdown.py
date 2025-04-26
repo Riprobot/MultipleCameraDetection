@@ -58,7 +58,7 @@ def main():
     frame_widths = [int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)) for cap in captures]
     frame_heights = [int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)) for cap in captures]
     
-    max_frames = int(fps_list[0] * 60)
+    max_frames = int(fps_list[0] * 30)
     
     out_cams = []
     for i in range(num_cameras):
