@@ -23,8 +23,8 @@
 │   ├── multiple_camera_topdown_kalman.py  
 │   └── kalman_filtering.py        # фильтр Калмана  
 ├── results/ # сгенерированные выходы
-│   ├── output_cam1_annotated.mp4
-│   ├── output_cam2_annotated.mp4
+│   ├── output_topdown_raw.mp4
+│   ├── output_topdown_smoothed.mp4
 ├── src/                           
 │   ├── camera_calib.py            # класс Camera: калибровка и устранение дисторсии  
 │   ├── multiple_camera_topdown.py # основной скрипт детекции и агрегации  
