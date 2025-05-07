@@ -49,12 +49,12 @@ python3 src/multiple_camera_topdown.py
 1. Загружает файлы калибровки из `data/calibration*.py`.  
 2. Открывает видеопотоки `data/cam*.mp4`.  
 3. Выполняет детекцию людей с помощью YOLO + BotSort.  
-4. Отсекает манекены. 
+4. Отсекает манекенов   . 
 5. Трансформирует координаты footpoints в координаты реального мира.  
 6. Агрегирует и связывает треки между камерами.  
 7. Сохраняет результаты:
-   - `output_cam<i>_annotated.mp4` — видео с рамками и ID  
-   - `output_topdown_raw.mp4` — «сырое» топ-down видео  
-   - `output_topdown_smoothed.mp4` — сглаженное топ-down видео  
+   - `output_cam<i>_annotated.mp4` — видео с детекцией для каждой камеры 
+   - `output_topdown_raw.mp4` — видео вида сверху без сглаживания
+   - `output_topdown_smoothed.mp4` — сглаженное видео  
 
 ---
