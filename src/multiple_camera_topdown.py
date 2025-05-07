@@ -3,11 +3,11 @@ import numpy as np
 import supervision as sv
 from ultralytics import YOLO
 from collections import defaultdict
-from reid import get_features
-from camera_calib import Camera
+from MultipleCameraDetection.src.reid import get_features
+from MultipleCameraDetection.src.camera_calib import Camera
 from scipy.spatial.distance import cosine
 from itertools import combinations
-from result_aggregator import Aggregator
+from MultipleCameraDetection.src.result_aggregator import Aggregator
 
 def distance_2d(p1, p2):
     return ((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)**0.5

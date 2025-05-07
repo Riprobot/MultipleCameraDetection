@@ -3,8 +3,8 @@ import numpy as np
 import supervision as sv  # If needed, else remove
 from ultralytics import YOLO
 from collections import defaultdict
-from reid import get_features
-from camera_calib import Camera
+from MultipleCameraDetection.src.reid import get_features
+from MultipleCameraDetection.src.camera_calib import Camera
 from scipy.spatial.distance import cosine
 from itertools import combinations
 

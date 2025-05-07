@@ -4,7 +4,7 @@ import supervision as sv
 from ultralytics import YOLO
 from collections import defaultdict
 
-from camera_calib import Camera
+from MultipleCameraDetection.src.camera_calib import Camera
 
 def main():
     cam = Camera("data/calibration1.py")
